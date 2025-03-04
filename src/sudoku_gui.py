@@ -13,7 +13,7 @@ class SudokuGUI:
 
         self.difficulty = tk.StringVar(master)
         self.difficulty.set("Средний")
-        difficulties = ["Легкий", "Средний", "Сложный", "Миссия невыполнима"]
+        difficulties = ["Легкий", "Средний", "Сложный"]
         tk.OptionMenu(control_frame, self.difficulty, *difficulties, command=self.new_game).pack(side=tk.LEFT, padx=5)
 
         tk.Button(control_frame, text="Новая игра", command=lambda: self.new_game(self.difficulty.get())).pack(side=tk.LEFT, padx=5)
@@ -32,7 +32,7 @@ class SudokuGUI:
             widget.destroy()
 
         # Определяем количество пустых ячеек
-        mapping = {"Легкий": 36, "Средний": 46, "Сложный": 56, "Миссия невыполнима": "Миссия невыполнима"}
+        mapping = {"Легкий": 36, "Средний": 46, "Сложный": 56}
         empties = mapping.get(difficulty, 46)
         self.game_board = generate_sudoku(empties)
 
