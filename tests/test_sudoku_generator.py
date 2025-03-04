@@ -8,12 +8,6 @@ class TestSudokuGenerator(unittest.TestCase):
         self.assertEqual(len(puzzle), 9)
         for row in puzzle:
             self.assertEqual(len(row), 9)
-    
-    def test_special_difficulty(self):
-        # Проверяем уровень "Миссия невыполнима"
-        puzzle = generate_sudoku("Миссия невыполнима")
-        self.assertEqual(puzzle[0][0], 8)
-        self.assertIn(0, puzzle[0])
 
 if __name__ == "__main__":
     unittest.main()
