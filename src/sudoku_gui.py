@@ -66,6 +66,15 @@ class SudokuGUI:
                 row.append(entry)
             self.widgets.append(row)
 
+    def validate_entry(self, event):
+        widget = event.widget
+        text = widget.get()
+        if text and (not text.isdigit() or int(text) < 1 or int(text) > 9):
+            widget.delete(0, tk.END)
+            widget.config(bg='#fa7373')
+        else:
+            widget.config(bg='white')
+
     def check_solution(self):
         correct = True
         for i, row in enumerate(self.widgets):
