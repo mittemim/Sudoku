@@ -20,6 +20,12 @@ class SudokuGUI:
         self.check_button = tk.Button(control_frame, text="Проверить", command=self.check_solution)
         self.check_button.pack(side=tk.RIGHT, padx=5)
 
+         # Панель для отображения дополнительной информации
+        info_frame = tk.Frame(master)
+        info_frame.pack(side=tk.TOP, pady=5)
+        self.info_label = tk.Label(info_frame, text="Введите числа в пустые ячейки", font=('Arial', 14))
+        self.info_label.pack()
+        
         # Фрейм игрового поля
         self.game_frame = tk.Frame(master, bg='black')
         self.game_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
