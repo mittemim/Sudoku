@@ -60,7 +60,7 @@ for _ in range(empties if isinstance(empties, int) else 36):
 return grid
 
 # Пример для ручного тестирования модуля (при выполнении файла напрямую)
-if __name__ == "__main__":
-puzzle = generate_sudoku(46)
-for row in puzzle:
- print(row)
+#if __name__ == "__main__":
+#puzzle = generate_sudoku(46)
+#for row in puzzle:
+# print(row)
