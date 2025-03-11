@@ -1,37 +1,41 @@
 import random
 
 def generate_sudoku(empties):
-       if empties == "Миссия невыполнима":      
-              return [
-                   [8, 0, 0, 0, 0, 0, 0, 0, 0],
-                   [0, 0, 3, 6, 0, 0, 0, 0, 0],
-                   [0, 7, 0, 0, 9, 0, 2, 0, 0],
-                   [0, 5, 0, 0, 0, 7, 0, 0, 0],
-                   [0, 0, 0, 0, 4, 5, 7, 0, 0],
-                   [0, 0, 0, 1, 0, 0, 0, 3, 0],
-                   [0, 0, 1, 0, 0, 0, 0, 6, 8],
-                   [0, 0, 8, 5, 0, 0, 0, 1, 0],
-                   [0, 9, 0, 0, 0, 0, 4, 0, 0]
-              ]
+    """
+    Генерирует заполненную доску Судоку и удаляет указанное количество ячеек.
 
-       base = 3  # Размер блока (3x3)
-       side = base * base  # Размер стороны доски
+    :param empties: Количество ячеек, которые нужно сделать пустыми (целое число) или строка "Миссия невыполнима" для особого уровня.
+    :return: Сгенерированная матрица 9x9, где 0 обозначает пустую ячейку.
+    """
+    if empties == "Миссия невыполнима":
+        return [
+            [8, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 3, 6, 0, 0, 0, 0, 0],
+            [0, 7, 0, 0, 9, 0, 2, 0, 0],
+            [0, 5, 0, 0, 0, 7, 0, 0, 0],
+            [0, 0, 0, 0, 4, 5, 7, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 3, 0],
+            [0, 0, 1, 0, 0, 0, 0, 6, 8],
+            [0, 0, 8, 5, 0, 0, 0, 1, 0],
+            [0, 9, 0, 0, 0, 0, 4, 0, 0]
+        ]
 
-def check(grid, row, col, num):
- # Проверка строки и столбца
- for x in range(side):
-     if grid[row][x] == num or grid[x][col] == num:
-         return False
- # Проверка блока 3x3
- startRow = base * (row // base)
- startCol = base * (col // base)
- for i in range(base):
-     for j in range(base):
-         if grid[i + startRow][j + startCol] == num:
-             return False
- return True
+    base = 3
+    side = base * base
 
-def fill_grid(grid):
+    def check(grid, row, col, num):
+        for x in range(side):
+            if grid[row][x] == num or grid[x][col] == num:
+                return False
+        startRow = base * (row // base)
+        startCol = base * (col // base)
+        for i in range(base):
+            for j in range(base):
+                if grid[i + startRow][j + startCol] == num:
+                    return False
+        return True
+
+    def fill_grid(grid):
         for i in range(side):
             for j in range(side):
                 if grid[i][j] == 0:
@@ -46,21 +50,18 @@ def fill_grid(grid):
                     return False
         return True
 
-# Создаём пустую сетку
-grid = [[0 for _ in range(side)] for _ in range(side)]
-fill_grid(grid)
+    grid = [[0 for _ in range(side)] for _ in range(side)]
+    fill_grid(grid)
 
-# Удаляем числа для создания паззла
-for _ in range(empties if isinstance(empties, int) else 36):
- i, j = random.randint(0, side - 1), random.randint(0, side - 1)
- while grid[i][j] == 0:
-     i, j = random.randint(0, side - 1), random.randint(0, side - 1)
- grid[i][j] = 0
+    for _ in range(empties if isinstance(empties, int) else 36):
+        i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+        while grid[i][j] == 0:
+            i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+        grid[i][j] = 0
 
-return grid
+    return grid
 
-# Пример для ручного тестирования модуля (при выполнении файла напрямую)
 if __name__ == "__main__":
-puzzle = generate_sudoku(46)
-for row in puzzle:
- print(row)
+    puzzle = generate_sudoku(46)
+    for row in puzzle:
+        print(row)
