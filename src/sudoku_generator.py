@@ -46,18 +46,18 @@ def fill_grid(grid):
              return False
  return True
 
-# Создаём пустую сетку
-grid = [[0 for _ in range(side)] for _ in range(side)]
-fill_grid(grid)
-
-# Удаляем числа для создания паззла
-for _ in range(empties if isinstance(empties, int) else 36):
- i, j = random.randint(0, side - 1), random.randint(0, side - 1)
- while grid[i][j] == 0:
-     i, j = random.randint(0, side - 1), random.randint(0, side - 1)
- grid[i][j] = 0
-
-return grid
+       # Создаём пустую сетку
+       grid = [[0 for _ in range(side)] for _ in range(side)]
+       fill_grid(grid)
+       
+       # Удаляем числа для создания паззла
+       for _ in range(empties if isinstance(empties, int) else 36):
+        i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+        while grid[i][j] == 0:
+            i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+        grid[i][j] = 0
+       
+       return grid
 
 # Пример для ручного тестирования модуля (при выполнении файла напрямую)
 #if __name__ == "__main__":
