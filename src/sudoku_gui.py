@@ -59,10 +59,10 @@ class SudokuGUI:
                 if self.game_board[i][j] != 0:
                     entry.insert(tk.END, str(self.game_board[i][j]))
                     entry.config(state='readonly', disabledforeground='black')
-                    else:
-                        entry.config(bg='white')
-                        # Добавляем обработчик, который позволяет вводить только цифры 1-9
-                        entry.bind("<KeyRelease>", self.validate_entry)
+                else:
+                    entry.config(bg='white')
+                    # Добавляем обработчик, который позволяет вводить только цифры 1-9
+                    entry.bind("<KeyRelease>", self.validate_entry)
                 row.append(entry)
             self.widgets.append(row)
 
