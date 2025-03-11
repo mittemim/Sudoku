@@ -32,32 +32,32 @@ def check(grid, row, col, num):
  return True
 
 def fill_grid(grid):
- for i in range(side):
-     for j in range(side):
-         if grid[i][j] == 0:
-             nums = list(range(1, side + 1))
-             random.shuffle(nums)
-             for num in nums:
-                 if check(grid, i, j, num):
-                     grid[i][j] = num
-                     if not any(0 in row for row in grid) or fill_grid(grid):
-                         return True
-                     grid[i][j] = 0
-             return False
- return True
+        for i in range(side):
+            for j in range(side):
+                if grid[i][j] == 0:
+                    nums = list(range(1, side + 1))
+                    random.shuffle(nums)
+                    for num in nums:
+                        if check(grid, i, j, num):
+                            grid[i][j] = num
+                            if not any(0 in row for row in grid) or fill_grid(grid):
+                                return True
+                            grid[i][j] = 0
+                    return False
+        return True
 
-       # Создаём пустую сетку
-       grid = [[0 for _ in range(side)] for _ in range(side)]
-       fill_grid(grid)
-       
-       # Удаляем числа для создания паззла
-       for _ in range(empties if isinstance(empties, int) else 36):
-        i, j = random.randint(0, side - 1), random.randint(0, side - 1)
-        while grid[i][j] == 0:
-            i, j = random.randint(0, side - 1), random.randint(0, side - 1)
-        grid[i][j] = 0
-       
-       return grid
+# Создаём пустую сетку
+grid = [[0 for _ in range(side)] for _ in range(side)]
+fill_grid(grid)
+
+# Удаляем числа для создания паззла
+for _ in range(empties if isinstance(empties, int) else 36):
+ i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+ while grid[i][j] == 0:
+     i, j = random.randint(0, side - 1), random.randint(0, side - 1)
+ grid[i][j] = 0
+
+return grid
 
 # Пример для ручного тестирования модуля (при выполнении файла напрямую)
 #if __name__ == "__main__":
