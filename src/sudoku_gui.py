@@ -1,13 +1,17 @@
 import tkinter as tk
 from tkinter import messagebox, Frame
 from sudoku_generator import generate_sudoku
+from timer import Timer
+from score import ScoreManager
+from records_manager import RecordsManager
+from sudoku_solver import solve_sudoku  # Импортируем решатель
 
 class SudokuGUI:
     def __init__(self, master):
         self.master = master
         master.title("Судоку")
 
-        # Фрейм управления: выбор сложности, кнопки
+        # Фрейм управления
         control_frame = tk.Frame(master)
         control_frame.pack(side=tk.TOP, pady=5)
 
@@ -18,14 +22,24 @@ class SudokuGUI:
 
         tk.Button(control_frame, text="Новая игра", command=lambda: self.new_game(self.difficulty.get())).pack(side=tk.LEFT, padx=5)
         self.check_button = tk.Button(control_frame, text="Проверить", command=self.check_solution)
-        self.check_button.pack(side=tk.RIGHT, padx=5)
+        self.check_button.pack(side=tk.LEFT, padx=5)
+        tk.Button(control_frame, text="Рекорды", command=self.show_records).pack(side=tk.LEFT, padx=5)
+        # Новая кнопка "Решить" для специального режима решения судоку
+        tk.Button(control_frame, text="Решить", command=self.solve_puzzle).pack(side=tk.LEFT, padx=5)
 
-         # Панель для отображения дополнительной информации
+        # Панель для отображения времени и счёта
         info_frame = tk.Frame(master)
         info_frame.pack(side=tk.TOP, pady=5)
-        self.info_label = tk.Label(info_frame, text="Введите числа в пустые ячейки", font=('Arial', 14))
-        self.info_label.pack()
-        
+        self.timer_label = tk.Label(info_frame, text="Время: 0 сек", font=('Arial', 14))
+        self.timer_label.pack(side=tk.LEFT, padx=10)
+        self.score_label = tk.Label(info_frame, text="Счёт: 1000", font=('Arial', 14))
+        self.score_label.pack(side=tk.LEFT, padx=10)
+
+        # Создаем объекты таймера, менеджера очков и менеджера рекордов
+        self.timer = Timer(self.timer_label)
+        self.score_manager = ScoreManager()
+        self.records_manager = RecordsManager()
+
         # Фрейм игрового поля
         self.game_frame = tk.Frame(master, bg='black')
         self.game_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -33,35 +47,41 @@ class SudokuGUI:
         self.new_game(self.difficulty.get())
 
     def new_game(self, difficulty):
-        # Очистка предыдущего поля
+        # Останавливаем предыдущий таймер, если он был запущен
+        if hasattr(self, 'timer'):
+            self.timer.running = False
+
         for widget in self.game_frame.winfo_children():
             widget.destroy()
 
-        # Определяем количество пустых ячеек
-        mapping = {"Легкий": 36, "Средний": 46, "Сложный": 56, "Миссия невыполнима":"Миссия невыполнима"}
+        mapping = {"Легкий": 36, "Средний": 46, "Сложный": 56, "Миссия невыполнима": "Миссия невыполнима"}
         empties = mapping.get(difficulty, 46)
         self.game_board = generate_sudoku(empties)
 
+        self.score_manager = ScoreManager()
+        self.score_label.config(text=f"Счёт: {self.score_manager.get_score()}")
+
+        self.timer = Timer(self.timer_label)
+        self.timer.start()
+
         # Создаем блоки 3x3
-        blocks = [[Frame(self.game_frame, borderwidth=1, relief="groove", bg='black') for _ in range(3)] for _ in range(3)]
+        blocks = [[tk.Frame(self.game_frame, borderwidth=2, relief="groove", bg='black') for _ in range(3)] for _ in range(3)]
         for i in range(3):
             for j in range(3):
-                blocks[i][j].grid(row=i, column=j, padx=1, pady=1)
+                blocks[i][j].grid(row=i, column=j, padx=2, pady=2)
 
-        # Создаем виджеты Entry для каждой ячейки
         self.widgets = []
         for i in range(9):
             row = []
             for j in range(9):
                 block = blocks[i // 3][j // 3]
                 entry = tk.Entry(block, width=2, font=('Arial', 24), justify='center', borderwidth=1)
-                entry.grid(row=i % 3, column=j % 3, padx=1, pady=1)
+                entry.grid(row=i % 3, column=j % 3, padx=2, pady=2)
                 if self.game_board[i][j] != 0:
                     entry.insert(tk.END, str(self.game_board[i][j]))
-                    entry.config(state='readonly', disabledforeground='black')
+                    entry.config(state='readonly', disabledforeground='black', readonlybackground='#d3d3d3')
                 else:
                     entry.config(bg='white')
-                    # Добавляем обработчик, который позволяет вводить только цифры 1-9
                     entry.bind("<KeyRelease>", self.validate_entry)
                 row.append(entry)
             self.widgets.append(row)
@@ -75,25 +95,70 @@ class SudokuGUI:
         else:
             widget.config(bg='white')
 
+    def finish_game(self):
+        elapsed = self.timer.stop()
+        bonus = max(0, 100 - elapsed)
+        self.score_manager.add_bonus(bonus)
+        self.score_label.config(text=f"Счёт: {self.score_manager.get_score()}")
+        new_record = self.records_manager.update_record(self.difficulty.get(), self.score_manager.get_score(), elapsed)
+        record_msg = "\nНовый рекорд!" if new_record else ""
+        messagebox.showinfo("Результат", f"Поздравляем! Вы решили Судоку за {elapsed} сек.\nВаш итоговый счёт: {self.score_manager.get_score()}{record_msg}")
+
     def check_solution(self):
         correct = True
         for i, row in enumerate(self.widgets):
             for j, widget in enumerate(row):
                 try:
                     val = int(widget.get())
-                    # Простейшая проверка: число от 1 до 9
                     if val < 1 or val > 9:
                         widget.config(bg='#fa7373')
                         correct = False
                     else:
-                        widget.config(bg='white')
+                        if widget.cget('state') != 'readonly':
+                            widget.config(bg='white')
                 except ValueError:
                     widget.config(bg='#fa7373')
                     correct = False
         if correct:
-            messagebox.showinfo("Результат", "Поздравляем! Вы правильно решили Судоку!")
+            self.finish_game()
         else:
             messagebox.showwarning("Результат", "Найдены ошибки. Неверные ячейки подсвечены красным.")
+
+    def show_records(self):
+        record = self.records_manager.get_record(self.difficulty.get())
+        if record:
+            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nЛучший счёт: {record['score']}\nВремя: {record['time']} сек")
+        else:
+            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nПока рекордов нет.")
+
+    def solve_puzzle(self):
+        """
+        Считывает текущую матрицу из виджетов, решает судоку и обновляет интерфейс.
+        Если решение найдено, заменяет введенные данные на решение.
+        """
+        board = []
+        for i, row in enumerate(self.widgets):
+            current_row = []
+            for j, widget in enumerate(row):
+                text = widget.get()
+                try:
+                    num = int(text) if text != "" else 0
+                except ValueError:
+                    num = 0
+                current_row.append(num)
+            board.append(current_row)
+
+        if solve_sudoku(board):
+            # Если решение найдено, обновляем виджеты с решением
+            for i, row in enumerate(self.widgets):
+                for j, widget in enumerate(row):
+                    widget.config(state='normal')
+                    widget.delete(0, tk.END)
+                    widget.insert(tk.END, str(board[i][j]))
+                    widget.config(state='readonly', disabledforeground='black', readonlybackground='#d3d3d3')
+            messagebox.showinfo("Результат", "Судоку решено!")
+        else:
+            messagebox.showerror("Ошибка", "Невозможно решить судоку с текущими данными.")
 
 if __name__ == "__main__":
     root = tk.Tk()
