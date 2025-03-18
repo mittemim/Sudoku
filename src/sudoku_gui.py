@@ -97,9 +97,9 @@ class SudokuGUI:
         bonus = max(0, 100 - elapsed)
         self.score_manager.add_bonus(bonus)
         self.score_label.config(text=f"Счёт: {self.score_manager.get_score()}")
-        new_record = self.records_manager.update_record(self.difficulty.get(), self.score_manager.get_score(), elapsed)
-        record_msg = "\nНовый рекорд!" if new_record else ""
-        messagebox.showinfo("Результат", f"Поздравляем! Вы решили Судоку за {elapsed} сек.\nВаш итоговый счёт: {self.score_manager.get_score()}{record_msg}")
+        # new_record = self.records_manager.update_record(self.difficulty.get(), self.score_manager.get_score(), elapsed)
+        # record_msg = "\nНовый рекорд!" if new_record else ""
+        messagebox.showinfo("Результат", f"Поздравляем! Вы решили Судоку за {elapsed} сек.")
 
     def check_solution(self):
         correct = True
