@@ -3,7 +3,6 @@ from tkinter import messagebox, Frame
 from sudoku_generator import generate_sudoku
 from timer import Timer
 from score import ScoreManager
-from records_manager import RecordsManager
 from sudoku_solver import solve_sudoku  # Импортируем решатель
 
 class SudokuGUI:
@@ -23,7 +22,6 @@ class SudokuGUI:
         tk.Button(control_frame, text="Новая игра", command=lambda: self.new_game(self.difficulty.get())).pack(side=tk.LEFT, padx=5)
         self.check_button = tk.Button(control_frame, text="Проверить", command=self.check_solution)
         self.check_button.pack(side=tk.LEFT, padx=5)
-        tk.Button(control_frame, text="Рекорды", command=self.show_records).pack(side=tk.LEFT, padx=5)
         # Новая кнопка "Решить" для специального режима решения судоку
         tk.Button(control_frame, text="Решить", command=self.solve_puzzle).pack(side=tk.LEFT, padx=5)
 
@@ -38,7 +36,6 @@ class SudokuGUI:
         # Создаем объекты таймера, менеджера очков и менеджера рекордов
         self.timer = Timer(self.timer_label)
         self.score_manager = ScoreManager()
-        self.records_manager = RecordsManager()
 
         # Фрейм игрового поля
         self.game_frame = tk.Frame(master, bg='black')
@@ -123,13 +120,6 @@ class SudokuGUI:
             self.finish_game()
         else:
             messagebox.showwarning("Результат", "Найдены ошибки. Неверные ячейки подсвечены красным.")
-
-    def show_records(self):
-        record = self.records_manager.get_record(self.difficulty.get())
-        if record:
-            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nЛучший счёт: {record['score']}\nВремя: {record['time']} сек")
-        else:
-            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nПока рекордов нет.")
 
     def solve_puzzle(self):
         """
