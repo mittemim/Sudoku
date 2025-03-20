@@ -3,7 +3,10 @@ import os
 
 class RecordsManager:
     def __init__(self, filename="records.json"):
-
+        """
+        Инициализирует менеджер рекордов.
+        :param filename: Имя файла для хранения рекордов.
+        """
         self.filename = filename
         self.records = self.load_records()
 
@@ -22,7 +25,13 @@ class RecordsManager:
             json.dump(self.records, file, indent=4, ensure_ascii=False)
 
     def update_record(self, difficulty, score, time_taken):
-
+        """
+        Обновляет рекорд для заданного уровня сложности, если текущий счёт выше.
+        :param difficulty: Уровень сложности.
+        :param score: Текущий счёт.
+        :param time_taken: Затраченное время.
+        :return: True, если рекорд обновлён, иначе False.
+        """
         if difficulty not in self.records or score > self.records[difficulty]["score"]:
             self.records[difficulty] = {"score": score, "time": time_taken}
             self.save_records()
@@ -30,5 +39,9 @@ class RecordsManager:
         return False
 
     def get_record(self, difficulty):
-
+        """
+        Возвращает рекорд для заданного уровня сложности.
+        :param difficulty: Уровень сложности.
+        :return: Словарь с рекордом или None, если рекорда нет.
+        """
         return self.records.get(difficulty, None)
