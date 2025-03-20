@@ -4,6 +4,7 @@ from sudoku_generator import generate_sudoku
 from timer import Timer
 from score import ScoreManager
 from sudoku_solver import solve_sudoku  # Импортируем решатель
+from records_manager import RecordsManager
 
 class SudokuGUI:
     def __init__(self, master):
@@ -22,8 +23,9 @@ class SudokuGUI:
         tk.Button(control_frame, text="Новая игра", command=lambda: self.new_game(self.difficulty.get())).pack(side=tk.LEFT, padx=5)
         self.check_button = tk.Button(control_frame, text="Проверить", command=self.check_solution)
         self.check_button.pack(side=tk.LEFT, padx=5)
-        # Новая кнопка "Решить" для специального режима решения судоку
         tk.Button(control_frame, text="Решить", command=self.solve_puzzle).pack(side=tk.LEFT, padx=5)
+          # Новая кнопка "Рекорды" для специального режима решения судоку
+        tk.Button(control_frame, text="Рекорды", command=self.show_records).pack(side=tk.LEFT, padx=5)
 
         # Панель для отображения времени и счёта
         info_frame = tk.Frame(master)
@@ -36,6 +38,7 @@ class SudokuGUI:
         # Создаем объекты таймера, менеджера очков и менеджера рекордов
         self.timer = Timer(self.timer_label)
         self.score_manager = ScoreManager()
+        self.records_manager = RecordsManager()
 
         # Фрейм игрового поля
         self.game_frame = tk.Frame(master, bg='black')
@@ -97,10 +100,18 @@ class SudokuGUI:
         bonus = max(0, 100 - elapsed)
         self.score_manager.add_bonus(bonus)
         self.score_label.config(text=f"Счёт: {self.score_manager.get_score()}")
-        # new_record = self.records_manager.update_record(self.difficulty.get(), self.score_manager.get_score(), elapsed)
-        # record_msg = "\nНовый рекорд!" if new_record else ""
-        messagebox.showinfo("Результат", f"Поздравляем! Вы решили Судоку за {elapsed} сек.")
+        new_record = self.records_manager.update_record(self.difficulty.get(), self.score_manager.get_score(), elapsed)
+        record_msg = "\nНовый рекорд!" if new_record else ""
+        messagebox.showinfo("Результат", f"Поздравляем! Вы решили Судоку за {elapsed} сек.\nВаш итоговый счёт: {self.score_manager.get_score()}{record_msg}")
 
+    def show_records(self):
+        record = self.records_manager.get_record(self.difficulty.get())
+        if record:
+            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nЛучший счёт: {record['score']}\nВремя: {record['time']} сек")
+        else:
+            messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nПока рекордов нет.")
+
+    
     def check_solution(self):
         correct = True
         for i, row in enumerate(self.widgets):
