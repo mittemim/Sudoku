@@ -145,7 +145,7 @@ class SudokuGUI:
             messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nПока рекордов нет.")
 
     
-  def check_solution(self):
+    def check_solution(self):
         """
         Проверяет все ячейки игрового поля:
         - Сначала проверяется, что значение в ячейке является числом от 1 до 9.
