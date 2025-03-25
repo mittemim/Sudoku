@@ -94,6 +94,39 @@ class SudokuGUI:
             widget.config(bg='#fa7373')
         else:
             widget.config(bg='white')
+            
+    def check_value(self, row, col, num):
+        """
+        Проверяет, соответствует ли значение num в ячейке (row, col) правилам Судоку:
+        - Число не должно повторяться в строке.
+        - Число не должно повторяться в столбце.
+        - Число не должно повторяться в блоке 3x3.
+        Возвращает True, если значение корректно, иначе False.
+        """
+        # Проверка строки
+        for x in range(9):
+            if x != col:
+                val = self.widgets[row][x].get()
+                if val == str(num):
+                    return False
+        # Проверка столбца
+        for y in range(9):
+            if y != row:
+                val = self.widgets[y][col].get()
+                if val == str(num):
+                    return False
+        # Проверка блока 3x3
+        startRow, startCol = 3 * (row // 3), 3 * (col // 3)
+        for i in range(3):
+            for j in range(3):
+                cur_row = startRow + i
+                cur_col = startCol + j
+                if cur_row == row and cur_col == col:
+                    continue
+                val = self.widgets[cur_row][cur_col].get()
+                if val == str(num):
+                    return False
+        return True
 
     def finish_game(self):
         elapsed = self.timer.stop()
@@ -112,18 +145,24 @@ class SudokuGUI:
             messagebox.showinfo("Рекорды", f"Уровень: {self.difficulty.get()}\nПока рекордов нет.")
 
     
-    def check_solution(self):
+  def check_solution(self):
+        """
+        Проверяет все ячейки игрового поля:
+        - Сначала проверяется, что значение в ячейке является числом от 1 до 9.
+        - Затем вызывается check_value(), которая проверяет уникальность числа в строке, столбце и блоке 3x3.
+        Если какая-либо ячейка нарушает правила, она подсвечивается красным.
+        """
         correct = True
         for i, row in enumerate(self.widgets):
             for j, widget in enumerate(row):
                 try:
                     val = int(widget.get())
-                    if val < 1 or val > 9:
+                    # Если число не в диапазоне 1-9 или нарушает уникальность, подсвечиваем красным
+                    if val < 1 or val > 9 or not self.check_value(i, j, val):
                         widget.config(bg='#fa7373')
                         correct = False
                     else:
-                        if widget.cget('state') != 'readonly':
-                            widget.config(bg='white')
+                        widget.config(bg='white')
                 except ValueError:
                     widget.config(bg='#fa7373')
                     correct = False
